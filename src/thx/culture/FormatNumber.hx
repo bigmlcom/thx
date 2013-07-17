@@ -46,10 +46,16 @@ class FormatNumber {
 			return v == Math.NEGATIVE_INFINITY ? culture.symbolNegInf : culture.symbolPosInf;
 		var fv = value(v, info, decimals == null ? info.decimals : (decimals < 0 ? 0 : decimals), culture.digits);
 		if(symbol != null) {
-    	    if (Std.parseFloat(fv) == 0) return StringTools.replace(StringTools.rpad('0.', '0', (decimals == null ? info.decimals : (decimals < 0 ? 0 : decimals)) + 2), symbol, replace);
+            if (Std.parseFloat(fv) == 0) {
+                if (decimals == 0) return '0';
+                return StringTools.replace(StringTools.rpad('0.', '0', (decimals == null ? info.decimals : (decimals < 0 ? 0 : decimals)) + 2), symbol, replace);
+            }
     	    return StringTools.replace(StringTools.replace(v < 0 ? negative : positive, 'n', fv), symbol, replace);
     	} else {
-    	    if (Std.parseFloat(fv) == 0) return StringTools.rpad('0.', '0', (decimals == null ? info.decimals : (decimals < 0 ? 0 : decimals)) + 2);
+            if (Std.parseFloat(fv) == 0) {
+                if (decimals == 0) return '0';
+                return StringTools.rpad('0.', '0', (decimals == null ? info.decimals : (decimals < 0 ? 0 : decimals)) + 2);
+            }
     	    return StringTools.replace(v < 0 ? negative : positive, 'n', fv);
     	}
 	}
