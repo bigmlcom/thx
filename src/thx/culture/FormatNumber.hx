@@ -69,49 +69,15 @@ class FormatNumber {
     }
 
     static function value(v : Float, info : NumberInfo, decimals : Int, digits : Array<String>) {
-    	var fv = '' + Math.abs(v);
-    	var pos = fv.indexOf('E');
-    	if(pos > 0) {
-    		var e = Std.parseInt(fv.substr(pos+1));
-    		var ispos = true;
-    		if(e < 0) {
-    			ispos = false;
-    			e = -e;
-    		}
-    		var s = StringTools.replace(fv.substr(0, pos), '.', '');
-    		if(ispos) {
-    			fv = StringTools.rpad(s, '0', e+1);
-    		} else {
-    			fv = '0'+StringTools.rpad('.', '0', e)+s;
-    		}
-    	}
-    	var parts = fv.split('.');
-    	var decpart = '';
-		if(decimals > 0) {
-    		//var decpart = parts.length == 1 ? StringTools.lpad('', '0', decimals) : (parts[1].length > decimals ? parts[1].substr(0, decimals) : StringTools.rpad(parts[1], '0', decimals));
-    		//var decpart = '';
-    		if (parts.length == 1) {
-    		    decpart = StringTools.lpad('', '0', decimals);
-    		} else if(parts[1].length > decimals) {// Ugly hack trying to avoid loose precision
-    			var tempFloat:Dynamic = Std.parseFloat('0.'+parts[1]);
-				var tempStrFloat:String = '' + Math.abs(Floats.round(tempFloat, decimals));
-				var decParts = tempStrFloat.split('.');
-				if (decParts.length == 1) {
-					decpart = StringTools.rpad("", "0", decimals);
-					parts[0] = (Std.parseInt(parts[0]) + 1) + '';
-				} else {
-					decpart = StringTools.rpad(decParts[1], "0", decimals);
-				}
-				//decpart = tempFloat.split('.')[1] || StringTools.rpad("", "0", decimals);
-    	    } else {
-    		    decpart =StringTools.rpad(parts[1], '0', decimals);
-    	    }
-			//return intpart + info.decimalsSeparator + processDigits(decpart, digits);
-		/*} else {
-			return intpart;*/
-		}
-    	var temp = parts[0];
+		var _v = Floats.round(Math.abs(v), decimals) + '';
+		var parts = _v.split('.');
+		var decpart = parts.length == 2 ? parts[1] : '';
+		decpart = StringTools.rpad(decpart.length > 0 ? decpart : '', '0', decimals);
 
+		//var replaceRegexStr = "([0-9])(?=(?:[0-9]{" + info.groups[0] + "})+$)";
+		//var replaceRegex = new EReg(replaceRegexStr, 'g');
+    	var temp = parts[0];
+    	// Add groups separator while process digits transforming it to the target culture
     	var intparts = [];
     	var group = 0;
     	while(true) {
@@ -128,33 +94,12 @@ class FormatNumber {
     			group++;
     	}
     	var intpart = intparts.join(info.groupsSeparator);
-    	if (decimals > 0) {
+		if (decimals > 0) {
+			//return replaceRegex.replace(intpart, '$1'+info.groupsSeparator) + info.decimalsSeparator +  decpart;
 			return intpart + info.decimalsSeparator + processDigits(decpart, digits);
 		} else {
+			//return replaceRegex.replace(intpart, '$1'+info.groupsSeparator);
 			return intpart;
 		}
-
-		/*if(decimals > 0) {
-    		//var decpart = parts.length == 1 ? StringTools.lpad('', '0', decimals) : (parts[1].length > decimals ? parts[1].substr(0, decimals) : StringTools.rpad(parts[1], '0', decimals));
-    		var decpart = '';
-    		if (parts.length == 1) {
-    		    decpart = StringTools.lpad('', '0', decimals);
-    		} else if(parts[1].length > decimals) {// Ugly hack trying to avoid loose precision
-    			var tempFloat:Dynamic = Std.parseFloat('0.'+parts[1]);
-				var tempStrFloat:String = '' + Math.abs(Floats.round(tempFloat, decimals));
-				var decParts = tempStrFloat.split('.');
-				if (decParts.length == 1) {
-					decpart = StringTools.rpad("", "0", decimals);
-				} else {
-					decpart = StringTools.rpad(decParts[1], "0", decimals);
-				}
-				//decpart = tempFloat.split('.')[1] || StringTools.rpad("", "0", decimals);
-    	    } else {
-    		    decpart =StringTools.rpad(parts[1], '0', decimals);
-    	    }
-			return intpart + info.decimalsSeparator + processDigits(decpart, digits);
-		} else {
-			return intpart;
-		}*/
 	}
 }
